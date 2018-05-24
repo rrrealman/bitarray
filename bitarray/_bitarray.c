@@ -2068,6 +2068,54 @@ bitarray_cpinvert(bitarrayobject *self)
     return res;
 }
 
+static PyObject *
+bitarray_rigth_shift(bitarrayobject *self, PyObject *v)
+{
+    PyObject *res;
+    idx_t offset, i;
+
+    if (PyLong_Check(v)) {
+        offset = PyLong_AsLongLong(v);
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "shift offset should be integer");
+        return NULL;
+    }
+    res =  newbitarrayobject(Py_TYPE(self), self->nbits, self->endian);
+    memset(((bitarrayobject *)res)->ob_item, 0x00, BYTES(self->nbits));
+    bitarrayobject *res_bitarray = (bitarrayobject *) res;
+    for (i = 0; i < self->nbits - offset; i++)
+    {
+        setbit(res_bitarray, i + offset, GETBIT(self, i));
+    }
+
+    return res;
+}
+
+static PyObject *
+bitarray_left_shift(bitarrayobject *self, PyObject *v)
+{
+    PyObject *res;
+    idx_t offset, i;
+
+    if (PyLong_Check(v)) {
+        offset = PyLong_AsLongLong(v);
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError, "shift offset should be integer");
+        return NULL;
+    }
+    res =  newbitarrayobject(Py_TYPE(self), self->nbits, self->endian);
+    memset(((bitarrayobject *)res)->ob_item, 0x00, BYTES(self->nbits));
+    bitarrayobject *res_bitarray = (bitarrayobject *) res;
+    for (i = self->nbits - 1; i > offset; i--)
+    {
+        setbit(res_bitarray, i - offset, GETBIT(self, i));
+    }
+
+    return res;
+}
+
 #define BITWISE_FUNC(oper)  \
 static PyObject *                                                   \
 bitarray_ ## oper (bitarrayobject *self, PyObject *other)           \
@@ -2522,6 +2570,8 @@ bitarray_methods[] = {
     {"__ior__",      (PyCFunction) bitarray_ior,         METH_O,       0},
     {"__ixor__",     (PyCFunction) bitarray_ixor,        METH_O,       0},
     {"__invert__",   (PyCFunction) bitarray_cpinvert,    METH_NOARGS,  0},
+    {"__rshift__",   (PyCFunction) bitarray_rigth_shift, METH_O,       0},
+    {"__lshift__",   (PyCFunction) bitarray_left_shift,  METH_O,       0},
 
     {NULL,           NULL}  /* sentinel */
 };

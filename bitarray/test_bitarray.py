@@ -1027,6 +1027,22 @@ class BitwiseTests(unittest.TestCase, Util):
 
             self.check_obj(b)
 
+    def test_right_shift(self):
+        a = bitarray('010110111')
+        b = a >> 3
+        self.assertEQUAL(b, bitarray('000010110'))
+
+        b = a >> 10
+        self.assertEQUAL(b, bitarray('000000000'))
+
+    def test_left_shift(self):
+        a = bitarray('111011010')
+        b = a << 3
+        self.assertEQUAL(b, bitarray('011010000'))
+
+        b = a << 10
+        self.assertEQUAL(b, bitarray('000000000'))
+
 
 tests.append(BitwiseTests)
 
